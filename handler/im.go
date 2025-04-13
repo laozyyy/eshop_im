@@ -172,7 +172,7 @@ func HandleOneHistory(ctx *gin.Context) {
 		log.Errorf("error: %d", err)
 		return
 	}
-	messages, _ := database.MGetMessage(nil, req.SenderId, req.ReceiverId, 10)
+	messages, _ := database.MGetMessage(nil, req.SenderId, req.ReceiverId, 6)
 	resp := GetOneHistoryResp{
 		Info:     "success",
 		Messages: messages,
