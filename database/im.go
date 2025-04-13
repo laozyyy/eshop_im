@@ -112,7 +112,7 @@ func MGetMessage(db *gorm.DB, uid, rUid string, limit int) ([]*Message, error) {
 			UNION
 			SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?
 		) AS combined
-		ORDER BY send_time ASC
+		ORDER BY send_time DESC
 		LIMIT ?
 	`
 
@@ -123,6 +123,10 @@ func MGetMessage(db *gorm.DB, uid, rUid string, limit int) ([]*Message, error) {
 		return nil, err
 	}
 	if len(res) > 0 {
+		var reverse []*Message
+		for i := len(res) - 1; i >= 0; i-- {
+			reverse = append(reverse, res[i])
+		}
 		return res, nil
 	}
 	return nil, nil
