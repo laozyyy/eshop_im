@@ -127,7 +127,7 @@ func MGetMessage(db *gorm.DB, uid, rUid string, limit int) ([]*Message, error) {
 		for i := len(res) - 1; i >= 0; i-- {
 			reverse = append(reverse, res[i])
 		}
-		return res, nil
+		return reverse, nil
 	}
 	return nil, nil
 }
