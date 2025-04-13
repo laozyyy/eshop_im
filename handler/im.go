@@ -135,14 +135,14 @@ func HandleMgetReceiver(ctx *gin.Context) {
 		var tmp ReceiverEntity
 		if message == nil {
 			tmp = ReceiverEntity{
-				Uid:          uid,
+				Uid:          rUid,
 				Name:         "test",
 				LastMessage:  "none",
 				LastSendTime: time.Now(),
 			}
 		} else {
 			tmp = ReceiverEntity{
-				Uid:          uid,
+				Uid:          rUid,
 				Name:         "test",
 				LastMessage:  message.Content,
 				LastSendTime: message.SendTime,

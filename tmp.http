@@ -50,3 +50,14 @@ Content-Type: application/json
 {
   "message": "test"
 }
+###
+GET http://localhost:9000/api/v1/im/receiver/mget?uid=930fbafc-f9ed-458f-a1cf-768d65f8825e
+
+###
+POST http://localhost:9000/api/v1/im/history/get_one
+Content-Type: application/json
+
+{
+  "sender_id": "930fbafc-f9ed-458f-a1cf-768d65f8825e",
+  "receiver_id": "33633d8f-b368-46b3-827d-d316af78f9a4"
+}

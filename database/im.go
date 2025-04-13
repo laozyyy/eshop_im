@@ -69,20 +69,29 @@ func GetReceiverUid(db *gorm.DB, uid string) ([]string, error) {
 		log.Errorf("error: %v", err)
 		return nil, err
 	}
-	receiver := res[0]
-	receiverUids := strings.Split(receiver.ReceiverUid, ",")
-	return receiverUids, nil
+	if len(res) > 0 {
+		receiver := res[0]
+		receiverUids := strings.Split(receiver.ReceiverUid, ",")
+		return receiverUids, nil
+	}
+	return nil, nil
 }
 
 func GetOneMessage(db *gorm.DB, uid, rUid string) (*Message, error) {
 	db = getDBInstance(db)
 	var res []*Message
-	err := db.Table("receiver").
-		Where("sender_id = ?", uid).
-		Where("receiver_id", rUid).
-		Order("send_time DESC").
-		Limit(1).
-		Find(&res).Error
+	query := `
+		SELECT * FROM (
+			SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?
+			UNION
+			SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?
+		) AS combined
+		ORDER BY send_time DESC
+		LIMIT 1
+	`
+
+	// 执行查询
+	err := db.Raw(query, uid, rUid, rUid, uid).Scan(&res).Error
 	if err != nil {
 		log.Errorf("error: %v", err)
 		return nil, err
@@ -96,12 +105,19 @@ func GetOneMessage(db *gorm.DB, uid, rUid string) (*Message, error) {
 func MGetMessage(db *gorm.DB, uid, rUid string, limit int) ([]*Message, error) {
 	db = getDBInstance(db)
 	var res []*Message
-	err := db.Table("receiver").
-		Where("sender_id = ?", uid).
-		Where("receiver_id", rUid).
-		Order("send_time ASC").
-		Limit(limit).
-		Find(&res).Error
+	// 构造 UNION 查询
+	query := `
+		SELECT * FROM (
+			SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?
+			UNION
+			SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?
+		) AS combined
+		ORDER BY send_time ASC
+		LIMIT ?
+	`
+
+	// 执行查询
+	err := db.Raw(query, uid, rUid, rUid, uid, limit).Scan(&res).Error
 	if err != nil {
 		log.Errorf("error: %v", err)
 		return nil, err
